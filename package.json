@@ -1,0 +1,10 @@
+{
+  "name": "your-app",
+  "version": "0.1.0",
+  "main": "main.js",
+  "devDependencies": {
+    "electron-prebuilt": "^0.33.3",
+    "electron-rebuild": "^1.0.0",
+    "node-blink1": "0.2.1"
+  }
+}
