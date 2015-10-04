@@ -19,9 +19,6 @@ blink1.setRGB(255,255,0);
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
 
-
-
-
 var appIcon        = null;
 var currentBlocker = null;
 
@@ -35,6 +32,31 @@ var icons = {
   notActive : NativeImage.createFromPath( path.join( __dirname, 'media', 'red.png' ) )
 }
 
+var pause = false;
+
+function togglePause(active) {
+  console.log("tP:" + active);
+  pause = active;
+  if (active) {
+    for (var i = 0; i < 12; ++i) {
+      blink1.writePatternLine(100, (i < 6 ? 255 : 0), 0, 0, i);
+    }
+    //blink1.writePatternLine(200, 0, 0, 0, 1);
+    blink1.play(0);
+  } else {
+    blink1.setRGB(currentMode.color[0],currentMode.color[1],currentMode.color[2]);
+  }
+}
+app.pause = function(){ 
+  console.log("app.pause");
+  togglePause(true);
+  appIcon.setContextMenu( menus.notActive );
+}
+app.unpause = function(){ 
+  togglePause(false);
+  appIcon.setContextMenu( menus.active );
+}
+
 /**
  * Menu to set inside of tray
  *
@@ -42,11 +64,11 @@ var icons = {
  */
 var menus = {
   active    : Menu.buildFromTemplate( [
-    { label: 'Pause', click : app.quit },
+    { label: 'Pause', click : app.pause },
     { label: 'Quit', click : app.quit }
   ] ),
   notActive : Menu.buildFromTemplate( [
-    { label: 'Unpause', click : app.quit },
+    { label: 'Unpause', click : app.unpause },
     { label: 'Quit', click : app.quit }
   ] )
 };
@@ -55,7 +77,7 @@ var menus = {
 var modes = {
   work: {
     duration: 5,
-    color: [0, 255, 0],
+    color: [65, 0, 125],
     nextMode: 'slack'
   },
   slack: {
@@ -70,8 +92,8 @@ var modeTimer = 0;
 var currentMode = modes.work;
 
 function tick() {
-  modeTimer += 1;
-  console.log('test');
+  if (!pause) modeTimer += 1;
+  console.log('test' + pause);
   if (modeTimer > currentMode.duration) {
   console.log('switch to:' + currentMode.nextMode);
 
@@ -91,7 +113,7 @@ function initTray() {
 
   appIcon = new Tray( path.resolve( __dirname, 'media', 'green.png' ) );
   appIcon.setToolTip( 'Blinkodoro' );
-  appIcon.setContextMenu( menus.notActive );
+  appIcon.setContextMenu( menus.active );
   setInterval(function(){
     tick();
   }, 1000); 
@@ -115,11 +137,11 @@ app.on('window-all-closed', function() {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
   // Create the browser window.
-//  mainWindow = new BrowserWindow({width: 800, height: 600});
+  mainWindow = new BrowserWindow({width: 800, height: 600});
   initTray();
 
   // and load the index.html of the app.
- // mainWindow.loadUrl('file://' + __dirname + '/index.html');
+ mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
   // Open the DevTools.
   //mainWindow.openDevTools();
