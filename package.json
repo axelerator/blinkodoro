@@ -6,5 +6,8 @@
     "electron-prebuilt": "^0.33.4",
     "electron-rebuild": "^1.0.0",
     "node-blink1": "0.2.1"
+  },
+  "dependencies": {
+    "electron-safe-ipc": "^0.6.1"
   }
 }

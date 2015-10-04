@@ -1,40 +1,59 @@
 React = require('react')
 ReactSlider = require('react-slider')
+Ipc = window.require('ipc')
 
+taskIds = 0
 mkTask = (title, mode) ->
-  {
     start: ->
-      @interval = setInterval((->
-        console.log 'Hello'
-        return
-      ), 1000)
-      return
+      return if @finished()
+      @interval = setInterval(() =>
+        @elapsed += 1
+        @stop() if @finished()
+        @observers.forEach (observer) ->
+          observer.update(@)
+      1000)
     stop: ->
       clearInterval @interval
       return
+    percent: ->
+      (@elapsed / @mode.duration) * 100.0
+    finished: ->
+      @percent() >= 100
+    id: taskIds += 1
     title: title
     elapsed: 0
     interval: null
     mode: mode
-  }
+    observers: []
 
 mkMode = (name, duration) ->
-  {
-    name: name
-    duration: duration
-  }
+  name: name
+  duration: duration
 
 Task = React.createClass(
   getInitialState: ->
-    { title: @props.task.title }
+    @props.task.observers.push @
+    return {
+      title: @props.task.title
+      percent: 0
+      finished: @props.task.finished()
+    }
+  update: ->
+    newState = {
+      title: @props.task.title
+      percent: @props.task.percent()
+      finished: @props.task.finished()
+    }
+    @setState(newState)
+    @props.onFinish(@props.task) if newState.finished
   render: ->
-      <div className="task">
-        {this.state.title}
-        <br />
-        <progress max="100" value="80"></progress>
-      </div>
+    <div className="task">
+      {@state.title} ({@state.finished})
+      <br />
+      <progress max="100" value={@state.percent}></progress>
+    </div>
 )
-Mode = React.createClass(
+Mode = React.createClass
   getInitialState: ->
     { duration: @props.mode.duration }
   changeDuration: (value) ->
@@ -50,9 +69,9 @@ Mode = React.createClass(
       <div>{this.state.duration}</div>
       <ReactSlider defaultValue={this.state.duration} min={0} max={60} onChange={this.changeDuration}/>
     </div>
-)
-workMode = mkMode('work', 10)
-breakMode = mkMode('break', 5)
+
+workMode = mkMode('work', 3)
+breakMode = mkMode('break', 2)
 modes = [
   workMode
   breakMode
@@ -60,66 +79,69 @@ modes = [
 tasks = [
   mkTask('react lernen', workMode)
   mkTask('break', breakMode)
+  mkTask('lampe blinken lassen', workMode)
+  mkTask('break', breakMode)
+  mkTask('essen', workMode)
+  mkTask('break', breakMode)
 ]
-BlinkodoroApp = React.createClass(
+ModeList = React.createClass
+  render: ->
+    modeNodes = @props.modes.map (mode) ->
+      <Mode key={mode.name} mode={mode} />
+    <div className="modeList">
+      {modeNodes}
+    </div>
+
+TaskList = React.createClass
   getInitialState: ->
-    {
-      running: false
-      modes: modes
-      tasks: tasks
-      currentTaskIndex: 0
-    }
+    tasks: @props.tasks
+    currentTask: @props.tasks[0]
+  handleTaskFinish: (task) ->
+    nextIndex = @props.tasks.indexOf(task) + 1
+    @state.currentTask = null
+    if nextIndex < @props.tasks.length
+      t = @props.tasks[nextIndex]
+      t.start()
+    @props.onChangeTask(t)
+  render: ->
+    taskNodes = @state.tasks.map((task) =>
+      <Task key={task.title + task.id} task={task} onFinish={@handleTaskFinish} />
+    )
+    <div className="taskList">
+      {taskNodes}
+    </div>
+
+BlinkodoroApp = React.createClass
+  getInitialState: ->
+    running: false
+    modes: modes
+    tasks: tasks
+    currentTask:  tasks[0]
   go: ->
     @state.running = true
+    @state.currentTask.start()
     @setState @state
+    Ipc.sendChannel('change-task', @state.currentTask.mode.name)
     return
   stop: ->
     @state.running = false
+    @state.currentTask.stop()
     @setState @state
     return
   className: ->
     'blinkodoro ' + (if @state.running then 'running' else 'halted')
-  currentTask: ->
-    @state.tasks[@state.currentTaskIndex]
+  handleTaskChange: (task) ->
+    @state.currentTask = task
+    Ipc.sendChannel('change-task',task.mode.name)
+    @setState @state
   render: ->
-    <div className={this.className()}>
-      <h1>{this.currentTask().title}</h1>
-      <button onClick={this.go}>GO!</button>
-      <button onClick={this.stop}>STOP!</button>
-    </div>
-)
-
-ModeList = React.createClass(render: ->
-  modeNodes = @props.modes.map (mode) ->
-    <Mode key={mode.name} mode={mode} />
-  return (
-    <div className="modeList">
-      {modeNodes}
-    </div>
-  )
-
-)
-
-TaskList = React.createClass(
-  getInitialState: ->
-    { tasks: @props.tasks }
-  render: ->
-    taskNodes = @state.tasks.map((task) ->
-      <Task key={task.title} task={task} />
-    )
-    return (
-      <div className="taskList">
-        {taskNodes}
+    <div class="container">
+      <div className={this.className()}>
+        <TaskList tasks={this.state.tasks} onChangeTask={@handleTaskChange} />
+        <button class="btn btn-default" onClick={this.go}>GO!</button>
+        <button onClick={this.stop}>STOP!</button>
       </div>
-    )
-)
-
-###
-React.render(
-  <TaskList tasks={tasks} />,
-  document.getElementById('example')
-);
-###
+    </div>
 
 
 React.render(
@@ -127,4 +149,3 @@ React.render(
   document.getElementById('app')
 )
 
-#React.render(<ReactSlider defaultValue={50} />, document.getElementById('example'));

@@ -10,11 +10,21 @@ require('crash-reporter').start();
 var Blink1 = require('node-blink1');
 console.log('hello');
 var blink1 = new Blink1();
-blink1.setRGB(255,255,0);
+blink1.off();
+
 //blink1.writePatternLine(200, 255, 0, 0, 0);
 //blink1.writePatternLine(200, 0, 0, 0, 1);
 //blink1.play(0);
+ipc = require('ipc')
 
+ipc.on('change-task', function(event, arg) {
+    console.log(arg);
+    if (arg == 'work') {
+      blink1.setRGB(255,0,0);
+    } else {
+      blink1.setRGB(0,255,0);
+    }
+});
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
@@ -114,9 +124,11 @@ function initTray() {
   appIcon = new Tray( path.resolve( __dirname, 'media', 'green.png' ) );
   appIcon.setToolTip( 'Blinkodoro' );
   appIcon.setContextMenu( menus.active );
+  /*
   setInterval(function(){
     tick();
   }, 1000); 
+  */
 }
 
 
