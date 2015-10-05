@@ -6,20 +6,23 @@ taskIds = 0
 mkTask = (title, mode) ->
     start: ->
       return if @finished()
+      @active = true
       @interval = setInterval(() =>
         @elapsed += 1
         @stop() if @finished()
-        @observers.forEach (observer) ->
+        @observers.forEach (observer) =>
           observer.update(@)
       1000)
     stop: ->
       clearInterval @interval
+      @active = false
       return
     percent: ->
       (@elapsed / @mode.duration) * 100.0
     finished: ->
       @percent() >= 100
     id: taskIds += 1
+    active: false
     title: title
     elapsed: 0
     interval: null
@@ -43,13 +46,19 @@ Task = React.createClass(
       title: @props.task.title
       percent: @props.task.percent()
       finished: @props.task.finished()
+      active: @props.task.active
     }
     @setState(newState)
     @props.onFinish(@props.task) if newState.finished
+  classString: ->
+    cs = ['task']
+    cs.push 'finished' if @state.finished
+    cs.push 'active' if @state.active
+    cs.join(' ')
   render: ->
-    <div className="task">
-      {@state.title} ({@state.finished})
-      <br />
+    <div className={@classString()}>
+      {@state.title}
+      <i className="fa fa-check-circle"></i>
       <progress max="100" value={@state.percent}></progress>
     </div>
 )
@@ -70,8 +79,8 @@ Mode = React.createClass
       <ReactSlider defaultValue={this.state.duration} min={0} max={60} onChange={this.changeDuration}/>
     </div>
 
-workMode = mkMode('work', 3)
-breakMode = mkMode('break', 2)
+workMode = mkMode('work', 10)
+breakMode = mkMode('break', 10)
 modes = [
   workMode
   breakMode
@@ -107,7 +116,7 @@ TaskList = React.createClass
     taskNodes = @state.tasks.map((task) =>
       <Task key={task.title + task.id} task={task} onFinish={@handleTaskFinish} />
     )
-    <div className="taskList">
+    <div className="task-list">
       {taskNodes}
     </div>
 
@@ -135,11 +144,13 @@ BlinkodoroApp = React.createClass
     Ipc.sendChannel('change-task',task.mode.name)
     @setState @state
   render: ->
-    <div class="container">
+    <div className="container">
       <div className={this.className()}>
         <TaskList tasks={this.state.tasks} onChangeTask={@handleTaskChange} />
-        <button class="btn btn-default" onClick={this.go}>GO!</button>
-        <button onClick={this.stop}>STOP!</button>
+        <div className="actions">
+          <button class="btn" onClick={this.go}>GO!</button>
+          <button onClick={this.stop}>STOP!</button>
+        </div>
       </div>
     </div>
 

@@ -4,56 +4,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
 
     <title>Hello World!</title>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
-    <style>
-        .slider {
-            width: 100%;
-            max-width: 500px;
-            height: 50px;
-            border: 1px solid grey;
-        }
-        .handle {
-            font-size: 0.9em;
-            text-align: center;
-            background-color: black;
-            color: white;
-            cursor: pointer;
-        }
-
-        .handle.active {
-            background-color: grey;
-        }
-        .bar {
-            position: relative;
-            background: #ddd;
-        }
-        .bar {
-            top: 20px;
-            height: 10px;
-        }
-        .handle {
-            top: 1px;
-            width: 50px;
-            height: 48px;
-            line-height: 48px;
-        }
-        .blinkodoro {
-          background-color: #EFE;
-        }
-
-        .blinkodoro.halted{
-          background-color: #FEE;
-        }
-
-    </style>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="media/styles.css" />
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
   </head>
   <body>
     <!--div>
- </div-->
     We are using io.js <script>document.write(process.version)</script>
     and Electron <script>document.write(process.versions['electron'])</script>.
+ </div-->
    
     <div id="app"></div>
+
     <script src="bundle.js"></script>
   </body>
 </html>
