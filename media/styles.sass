@@ -28,16 +28,24 @@ body, button
   height: 48px
   line-height: 48px
 
-.task-list
+=grayBox
+  box-shadow: 3px 3px 3px #DDD
+  margin: 5px
+  padding: 10px
+  background-color: #EEE
+
+.task-list, 
   display: flex
   flex-direction: column
   justify-content: center
   padding: 0 20%
   .task
-    box-shadow: 3px 3px 3px #DDD
-    margin: 5px
-    padding: 10px
-    background-color: #EEE
+    +grayBox
+    .duration
+      color: #AAA
+      font-size: 0.8em
+    &.break, &.bigBreak
+      text-align: center
     i
       float: right
       display: none
@@ -56,14 +64,29 @@ body, button
     &.finished
       opacity: 0.7
 
+.task-input
+  +grayBox
+  margin: 10px 20%
+  display: flex
+  flex-direction: row
+  input
+    flex: 3 0 auto
+    margin-right: 10px
+  button
+    flex: 1 0 auto
+    box-shadow: 3px 3px 3px #DDD
+    background-color: white
+    border: none
+    outline: 0
+
+
 .actions
   margin-top: 20px
   padding: 0 20%
   display: flex
   button
     font-size: 1.2em
-    box-shadow: 5px 5px 5px #DDD
-    background-color: white
+    box-shadow: 3px 3px 3px #DDD
     border: 1px solid #CCC
     width: 50%
     height: 50px
@@ -71,3 +94,11 @@ body, button
     outline: 0
     color: white
     background-color: #79F
+    &.stop
+      background-color: lighten(#79F, 15%)
+.container .running button
+  &.go
+    background-color: lighten(#79F, 15%)
+  &.stop
+    background-color: #79F
+

@@ -1,2 +1,6 @@
 node_modules
 bundle.js
+media/.sass-cache
+media/styles.css
+media/styles.css.map
+blinkodoro-darwin-x64
