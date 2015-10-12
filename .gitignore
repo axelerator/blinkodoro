@@ -4,3 +4,5 @@ media/.sass-cache
 media/styles.css
 media/styles.css.map
 blinkodoro-darwin-x64
+.DS_Store
+styles.css

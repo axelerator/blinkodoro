@@ -1,3 +1,4 @@
+Shell = require('shell')
 var app = require('app');  // Module to control application life.
 var BrowserWindow = require('browser-window');  // Module to create native browser window.
 
@@ -8,7 +9,38 @@ var Tray             = require( 'tray' );
 var NativeImage      = require( 'native-image' );
 require('crash-reporter').start();
 var Blink1 = require('node-blink1');
+var blink1 =  null;
 ipc = require('ipc')
+
+ipc.on('openInfo', function(event, arg) {
+  Shell.openExternal('https://de.wikipedia.org/wiki/Pomodoro-Technik');
+});
+
+
+ipc.on('off', function(event, rgb) {
+  if (blink1 != null) {
+    blink1.off();
+  }
+})
+ipc.on('setColor', function(event, rgb) {
+    if (blink1 == null) {
+      return;
+    }
+    blink1.setRGB(rgb[0],rgb[1],rgb[2]);
+});
+
+ipc.on('setModeColor', function(event, mode, rgb) {
+    if (blink1 == null) {
+      return;
+    }
+    if (mode == 'pomodoro') {
+      blink1.writePatternLine(5200, rgb[0], rgb[1], rgb[2], 0);
+    } else if (mode == 'break') {
+      blink1.writePatternLine(1200, rgb[0], rgb[1], rgb[2], 2);
+    } else if (mode == 'bigBreak') {
+      blink1.writePatternLine(5200, rgb[0], rgb[1], rgb[2], 4);
+    } 
+});
 
 ipc.on('change-task', function(event, arg) {
     if (blink1 == null) {
