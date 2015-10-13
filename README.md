@@ -5,7 +5,11 @@ Jedoch wird zur Indikation des Ablaufens eines Intervals keine Küchenuhr sonder
 
 # Installation
 
-Für OSX gibt es ein fertiges [Binary](https://www.dropbox.com/s/bmxublmo6jtrlfw/blinkodoro.dmg?dl=0)
+Fertige Binaries:
+
+* [Mac OSX](https://www.dropbox.com/s/bmxublmo6jtrlfw/blinkodoro.dmg?dl=0)
+* [Win 64Bit](https://www.dropbox.com/s/5wa9bh28ugbswyo/blinkodoro-win32-x64.zip?dl=0)
+* [Linux 64Bit](https://www.dropbox.com/s/suf6wq5yo9kakcr/blinkodoro-linux-x64.zip?dl=0)
 
 # Bauen
 
