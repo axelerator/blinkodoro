@@ -3,6 +3,11 @@
 Dies ist eine kleine App zur Anwendung der [Pomodoro Technik](https://de.wikipedia.org/wiki/Pomodoro-Technik).
 Jedoch wird zur Indikation des Ablaufens eines Intervals keine Küchenuhr sondern ein [Blink1](http://blink1.thingm.com/) verwendet.
 
+Die Länge der Intervalle und die Farben lassen sich in der Anwendung konfigurieren.
+
+![Screenshot](https://raw.githubusercontent.com/axelerator/blinkodoro/master/media/screenshot.jpg)
+
+
 # Installation
 
 Fertige Binaries:
